@@ -37,17 +37,67 @@ const createDoctor = async (req, res = response) => {
 };
 
 const updateDoctor = async (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: 'updateDoctor',
-  });
+  const { uid } = req;
+  const { id } = req.params;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'Doctor not found',
+      });
+    }
+
+    const updatedFields = {
+      ...req.body,
+      user: uid,
+    };
+
+    const updatedDoctor = await Doctor.findByIdAndUpdate(id, updatedFields, {
+      new: true,
+    });
+
+    res.json({
+      ok: true,
+      doctor: updatedDoctor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: true,
+      msg: 'Something went wrong',
+    });
+  }
 };
 
 const deleteDoctor = async (req, res = response) => {
-  res.json({
-    ok: true,
-    msg: 'deleteDoctor',
-  });
+  const { id } = req.params;
+
+  try {
+    const doctor = await Doctor.findById(id);
+
+    if (!doctor) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'Doctor not found',
+      });
+    }
+
+    await Doctor.findByIdAndDelete(id);
+
+    res.json({
+      ok: true,
+      msg: 'Doctor deleted',
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Something went wrong',
+    });
+  }
 };
 
 module.exports = {
