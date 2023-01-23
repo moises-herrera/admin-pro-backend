@@ -76,7 +76,17 @@ const updateUser = async (req, res = response) => {
     const { password, google, email, ...fields } = req.body;
 
     if (userDB.email !== email) {
+      if (userDB.google) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'A google user cannot update an email',
+        });
+      } else {
+        fields.email = email;
+      }
+
       const existsEmail = await User.findOne({ email });
+
       if (existsEmail) {
         return res.status(400).json({
           ok: false,
