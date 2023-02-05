@@ -5,7 +5,7 @@ const Doctor = require('../models/doctor');
 const getDoctors = async (req, res = response) => {
   const doctors = await Doctor.find()
     .populate('user', 'name')
-    .populate('hospital', 'name');
+    .populate('hospital', 'name img');
 
   res.json({
     ok: true,
@@ -100,8 +100,30 @@ const deleteDoctor = async (req, res = response) => {
   }
 };
 
+const getDoctorById = async (req, res = response) => {
+  const { id } = req.params;
+
+  try {
+    const doctor = await Doctor.findById(id)
+      .populate('user', 'name')
+      .populate('hospital', 'name img');
+
+    res.json({
+      ok: true,
+      doctor,
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      ok: false,
+      msg: 'Something went wrong',
+    });
+  }
+};
+
 module.exports = {
   getDoctors,
+  getDoctorById,
   createDoctor,
   updateDoctor,
   deleteDoctor,
